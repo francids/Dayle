@@ -1,5 +1,5 @@
 {
-  "name": "dayle-api",
+  "name": "dayle",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
@@ -9,8 +9,10 @@
     "fmt": "oxfmt"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.7",
     "ai": "^7.0.19",
-    "hono": "^4.12.27"
+    "hono": "^4.12.27",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "oxfmt": "^0.58.0",
