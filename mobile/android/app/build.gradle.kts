@@ -22,10 +22,18 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String", "API_BASE_URL", "\"https://dayle.francids.workers.dev\""
+            )
+        }
         release {
             optimization {
                 enable = false
             }
+            buildConfigField(
+                "String", "API_BASE_URL", "\"https://dayle.francids.workers.dev\""
+            )
         }
     }
     compileOptions {
@@ -34,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -46,6 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.kotlinx.coroutines.android)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

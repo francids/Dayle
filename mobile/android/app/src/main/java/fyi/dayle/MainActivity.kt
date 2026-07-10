@@ -4,31 +4,46 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import fyi.dayle.data.DayleDatabase
+import fyi.dayle.data.MissionRepository
+import fyi.dayle.data.MissionService
+import fyi.dayle.ui.MissionScreen
+import fyi.dayle.ui.MissionUiState
 import fyi.dayle.ui.theme.DayleTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var repository: MissionRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        repository = MissionRepository(
+            database = DayleDatabase(applicationContext),
+            service = MissionService(BuildConfig.API_BASE_URL)
+        )
         enableEdgeToEdge()
         setContent {
             DayleTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(
-                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Hi, this is Dayle!", modifier = Modifier.padding(innerPadding)
-                        )
-                    }
-                }
+                MissionScreen(
+                    loadMission = { loadMission() },
+                    onToggleCompleted = { toggleCompleted() })
             }
         }
+    }
+
+    private fun loadMission(): MissionUiState {
+        return try {
+            val existing = repository.getTodayMission()
+            val mission = existing ?: repository.fetchAndStoreTodayMission()
+            MissionUiState.Loaded(mission.text, mission.completed)
+        } catch (e: Exception) {
+            MissionUiState.Error(e.message ?: "Error desconocido")
+        }
+    }
+
+    private fun toggleCompleted(): Boolean {
+        val mission = repository.getTodayMission() ?: return false
+        val newCompleted = !mission.completed
+        repository.setCompleted(mission, newCompleted)
+        return newCompleted
     }
 }
